@@ -1,0 +1,77 @@
+<div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+  <h2 class="text-lg font-semibold text-gray-800 mb-5">
+    {{ isEdit ? '編輯單字' : '新增單字' }}
+  </h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">韓文 <span class="text-red-500">*</span></label>
+      <input
+        type="text"
+        formControlName="korean"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="예: 안녕하세요"
+      />
+      @if (form.get('korean')?.invalid && form.get('korean')?.touched) {
+        <p class="mt-1 text-xs text-red-600">韓文為必填</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">中文 <span class="text-red-500">*</span></label>
+      <input
+        type="text"
+        formControlName="chinese"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="例: 你好"
+      />
+      @if (form.get('chinese')?.invalid && form.get('chinese')?.touched) {
+        <p class="mt-1 text-xs text-red-600">中文意思為必填</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">詞性／類型</label>
+      <div class="flex flex-wrap gap-2">
+        @for (cat of categories; track cat) {
+          <button
+            type="button"
+            (click)="selectCategory(cat)"
+            [class.bg-blue-600]="form.get('category')?.value === cat"
+            [class.text-white]="form.get('category')?.value === cat"
+            [class.border-blue-600]="form.get('category')?.value === cat"
+            [class.bg-white]="form.get('category')?.value !== cat"
+            [class.text-gray-600]="form.get('category')?.value !== cat"
+            [class.border-gray-300]="form.get('category')?.value !== cat"
+            class="px-3 py-1 text-sm border rounded-full transition-colors hover:border-blue-400"
+          >{{ cat }}</button>
+        }
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">資料夾</label>
+      <select
+        formControlName="folderId"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+      >
+        <option [ngValue]="null">— 不指定資料夾 —</option>
+        @for (folder of folders; track folder.id) {
+          <option [ngValue]="folder.id">{{ folder.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-2">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+      >取消</button>
+      <button
+        type="submit"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+      >{{ isEdit ? '儲存' : '新增' }}</button>
+    </div>
+  </form>
+</div>

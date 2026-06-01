@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+}
+
+.cdk-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.cdk-global-overlay-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+}
+
+/* 資料夾編輯模式抖動動畫（仿 iOS 主畫面） */
+@keyframes folder-jiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-1deg); }
+  75%       { transform: rotate(1deg); }
+}
+
+.folder-jiggle {
+  animation: folder-jiggle 0.4s ease-in-out infinite;
+  transform-origin: center bottom;
+}

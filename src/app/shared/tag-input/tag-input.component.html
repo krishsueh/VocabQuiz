@@ -1,0 +1,23 @@
+<div class="flex flex-wrap gap-1 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+  @for (tag of tags; track tag) {
+    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-sm rounded-full">
+      {{ tag }}
+      <button
+        type="button"
+        (click)="removeTag(tag)"
+        [disabled]="disabled"
+        class="hover:text-blue-600 disabled:opacity-50"
+        [attr.aria-label]="'移除標籤 ' + tag"
+      >&#x2715;</button>
+    </span>
+  }
+  <input
+    type="text"
+    [(ngModel)]="inputValue"
+    (keydown)="onKeydown($event)"
+    (input)="onInput()"
+    [disabled]="disabled"
+    placeholder="輸入標籤後按 Enter 或逗號"
+    class="flex-1 min-w-[120px] outline-none text-sm bg-transparent"
+  />
+</div>

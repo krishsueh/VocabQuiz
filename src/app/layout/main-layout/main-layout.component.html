@@ -1,0 +1,108 @@
+<!-- Desktop Sidebar -->
+  <aside class="hidden lg:flex flex-col w-52 shrink-0 border-r border-gray-200 bg-white">
+
+    <!-- 固定頂部 -->
+    <div class="px-3 pt-4 flex flex-col gap-1">
+      <button
+        (click)="setWordView('all')"
+        [class.bg-blue-50]="isOnWords && activeWordView === 'all'"
+        [class.text-blue-700]="isOnWords && activeWordView === 'all'"
+        [class.font-medium]="isOnWords && activeWordView === 'all'"
+        class="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+      >
+        <i class="fas fa-book w-4 text-center"></i> 所有卡片
+      </button>
+
+      <button
+        (click)="setWordView('favorites')"
+        [class.bg-blue-50]="isOnWords && activeWordView === 'favorites'"
+        [class.text-blue-700]="isOnWords && activeWordView === 'favorites'"
+        [class.font-medium]="isOnWords && activeWordView === 'favorites'"
+        class="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+      >
+        <i class="fas fa-star w-4 text-center"></i> 標記收藏
+      </button>
+    </div>
+
+    <!-- 可捲動的資料夾列表（flex-1 讓它佔滿剩餘空間，min-h-0 防止 flex 溢出） -->
+    <div class="flex-1 min-h-0 overflow-y-auto px-3 py-1 flex flex-col gap-1">
+      @if (folders.length > 0) {
+        <hr class="my-1 border-gray-200" />
+      }
+
+      @for (folder of folders; track folder.id) {
+        <div class="group flex items-center gap-1">
+          @if (editingFolderId === folder.id) {
+            <input
+              type="text"
+              [(ngModel)]="editingFolderName"
+              (keydown)="onEditFolderKeydown($event)"
+              (blur)="saveFolder()"
+              class="flex-1 px-2 py-1 text-sm border border-blue-400 rounded-md focus:outline-none"
+              autofocus
+            />
+          } @else {
+            <button
+              (click)="setWordView(folder.id!)"
+              [class.bg-blue-50]="isOnWords && activeWordView === folder.id"
+              [class.text-blue-700]="isOnWords && activeWordView === folder.id"
+              [class.font-medium]="isOnWords && activeWordView === folder.id"
+              class="flex-1 flex items-center gap-2 px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left min-w-0"
+            >
+              <i class="fas fa-folder w-4 text-center shrink-0"></i>
+              <span class="truncate">{{ folder.name }}</span>
+            </button>
+            <div class="hidden group-hover:flex gap-0.5">
+              <button (click)="startEditFolder(folder)" class="p-1 text-gray-400 hover:text-gray-600 rounded" title="重新命名">
+                <i class="fas fa-pencil text-xs"></i>
+              </button>
+              <button (click)="confirmDeleteFolder(folder)" class="p-1 text-gray-400 hover:text-red-500 rounded" title="刪除資料夾">
+                <i class="fas fa-xmark text-xs"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <hr class="my-1 border-gray-200" />
+
+      <div class="flex items-center gap-1 px-1">
+        <input
+          type="text"
+          [(ngModel)]="newFolderName"
+          (keydown)="onNewFolderKeydown($event)"
+          placeholder="新增資料夾…"
+          class="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+        />
+        <button
+          (click)="addFolder()"
+          [disabled]="!newFolderName.trim()"
+          class="px-2 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md disabled:opacity-40 transition-colors"
+        ><i class="fas fa-plus"></i></button>
+      </div>
+    </div>
+
+    <!-- 固定底部按鈕 -->
+    <div class="px-3 pb-4 border-t border-gray-200 pt-2 flex flex-col gap-0.5">
+      <button
+        (click)="goToQuiz()"
+        [class.bg-blue-50]="isOnQuiz"
+        [class.text-blue-700]="isOnQuiz"
+        [class.font-medium]="isOnQuiz"
+        class="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+      >
+        <i class="fas fa-pen-to-square w-4 text-center"></i> 出考題
+      </button>
+      <button
+        (click)="openSettings()"
+        class="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+      >
+        <i class="fas fa-gear w-4 text-center"></i> 設定
+      </button>
+    </div>
+  </aside>
+
+<!-- Main content -->
+<div class="flex-1 min-w-0 overflow-y-auto">
+  <router-outlet></router-outlet>
+</div>

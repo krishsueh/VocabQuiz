@@ -1,0 +1,197 @@
+<div class="flex-1 min-w-0 flex flex-col">
+
+  <!-- Mobile/Tablet: Home view (source selector, below 1024px) -->
+  @if (viewMode === 'home') {
+    <div class="lg:hidden flex-1 px-4 py-5 pb-20">
+      <div class="space-y-2.5">
+        <!-- 所有卡片 -->
+        <button (click)="selectSource('all')"
+          class="w-full flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 active:bg-gray-50 text-left">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+            <i class="fas fa-book text-blue-500"></i>
+          </div>
+          <span class="flex-1 font-medium text-gray-800">所有卡片</span>
+          <i class="fas fa-chevron-right text-gray-300 text-sm"></i>
+        </button>
+
+        <!-- 標記收藏 -->
+        <button (click)="selectSource('favorites')"
+          class="w-full flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 active:bg-gray-50 text-left">
+          <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center shrink-0">
+            <i class="fas fa-star text-yellow-400"></i>
+          </div>
+          <span class="flex-1 font-medium text-gray-800">標記收藏</span>
+          <i class="fas fa-chevron-right text-gray-300 text-sm"></i>
+        </button>
+
+        @if (folders.length > 0) {
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pt-2">資料夾</p>
+        }
+
+        <div cdkDropList (cdkDropListDropped)="onFolderDrop($event)" class="space-y-2.5">
+          @for (folder of folders; track folder.id) {
+            <div cdkDrag
+                 [cdkDragDisabled]="!folderEditMode"
+                 [cdkDragStartDelay]="{ touch: 0, mouse: 0 }"
+                 (touchstart)="startLongPress()"
+                 (touchend)="cancelLongPress()"
+                 (touchmove)="cancelLongPress()">
+              <div class="relative" [class.folder-jiggle]="folderEditMode">
+                @if (folderEditMode) {
+                  <button
+                    (click)="confirmDeleteFolder(folder); $event.stopPropagation()"
+                    class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
+                  >
+                    <i class="fas fa-xmark text-white" style="font-size:9px"></i>
+                  </button>
+                }
+                <button
+                  (click)="!folderEditMode && selectSource(folder.id!)"
+                  class="w-full flex items-center gap-4 px-4 py-4 bg-white rounded-xl border border-gray-200 text-left"
+                >
+                  <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                    <i class="fas fa-folder text-indigo-400"></i>
+                  </div>
+                  <span class="font-medium text-gray-800 truncate flex-1">{{ folder.name }}</span>
+                  @if (!folderEditMode) {
+                    <i class="fas fa-chevron-right text-gray-300 text-sm shrink-0"></i>
+                  }
+                </button>
+              </div>
+              <ng-template cdkDragPlaceholder>
+                <div class="h-[72px] bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl"></div>
+              </ng-template>
+            </div>
+          }
+        </div>
+
+        <!-- 新增資料夾 -->
+        @if (!showNewFolderInput) {
+          <button (click)="showNewFolderInput = true"
+            class="w-full flex items-center gap-3 p-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 hover:border-blue-300 hover:text-blue-400 transition-colors">
+            <i class="fas fa-plus"></i>
+            <span class="text-sm">新增資料夾</span>
+          </button>
+        } @else {
+          <div class="flex gap-2 bg-white p-3 rounded-xl border border-blue-300">
+            <input
+              type="text"
+              [(ngModel)]="newFolderName"
+              (keydown)="onNewFolderKeydown($event)"
+              placeholder="資料夾名稱"
+              class="flex-1 text-sm focus:outline-none"
+              autofocus
+            />
+            <button (click)="addFolder()" [disabled]="!newFolderName.trim()"
+              class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg disabled:opacity-40">
+              新增
+            </button>
+            <button (click)="showNewFolderInput = false; newFolderName = ''"
+              class="px-2 py-1 text-sm text-gray-400 hover:text-gray-600">
+              取消
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Word list (desktop always, mobile only in list mode) -->
+  <main class="flex-1 min-w-0 px-4 py-6 lg:pb-6"
+        [class.hidden]="viewMode === 'home'"
+        [class.pb-20]="viewMode === 'list'">
+    <div>
+
+      <!-- Mobile/Tablet: back button + title -->
+      <div class="flex items-center gap-3 mb-5 lg:hidden">
+        <button (click)="goHome()" class="w-8 h-8 flex items-center justify-center text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="text-xl font-bold text-gray-800 flex-1">
+          @if (activeView === 'all') { 所有卡片 }
+          @else if (activeView === 'favorites') { <i class="fas fa-star text-yellow-400"></i> 標記收藏 }
+          @else { <i class="fas fa-folder text-gray-500"></i> {{ folderName(activeView) }} }
+        </h1>
+      </div>
+
+      <!-- Desktop: title + add button -->
+      <div class="hidden lg:flex items-center gap-2 mb-5">
+        <h1 class="text-xl font-bold text-gray-800 flex-1">
+          @if (activeView === 'all') { 所有卡片 }
+          @else if (activeView === 'favorites') { <i class="fas fa-star text-yellow-400"></i> 標記收藏 }
+          @else { <i class="fas fa-folder text-gray-500"></i> {{ folderName(activeView) }} }
+        </h1>
+        <button (click)="openAdd()"
+          class="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
+          <i class="fas fa-plus"></i> 新增單字
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      @if (words.length === 0) {
+        <div class="text-center py-16 text-gray-400">
+          <p class="text-4xl mb-3"><i class="fas fa-book-open"></i></p>
+          @if (activeView === 'all') {
+            <p class="text-base">尚未新增任何單字</p>
+            <p class="text-sm mt-1">點擊「新增單字」開始建立單字庫</p>
+          } @else if (activeView === 'favorites') {
+            <p class="text-base">尚無收藏單字</p>
+            <p class="text-sm mt-1">點擊單字右側的 <i class="far fa-star"></i> 加入收藏</p>
+          } @else {
+            <p class="text-base">此資料夾尚無單字</p>
+            <p class="text-sm mt-1">新增單字時選擇此資料夾即可</p>
+          }
+        </div>
+      } @else {
+        <div class="space-y-2">
+          @for (word of words; track word.id) {
+            <div class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-lg font-bold text-gray-900">
+                    {{ displaySettings.primaryLang === 'korean' ? word.korean : word.chinese }}
+                  </span>
+                  @if (displaySettings.showSecondary) {
+                    <span class="text-gray-500 text-sm">
+                      {{ displaySettings.primaryLang === 'korean' ? word.chinese : word.korean }}
+                    </span>
+                  }
+                </div>
+                @if (word.category || word.folderId != null) {
+                  <div class="flex items-center gap-2 mt-1">
+                    @if (word.category) {
+                      <span class="px-1.5 py-0.5 text-xs rounded-full font-medium {{ categoryColor[word.category] }}">
+                        {{ word.category }}
+                      </span>
+                    }
+                    @if (word.folderId != null) {
+                      <span class="text-xs text-gray-400"><i class="fas fa-folder"></i> {{ folderName(word.folderId) }}</span>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  (click)="toggleFavorite(word)"
+                  class="text-xl hover:scale-110 transition-transform p-1"
+                  [title]="word.isFavorite ? '取消收藏' : '加入收藏'"
+                >
+                  <i [class]="word.isFavorite ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'"></i>
+                </button>
+                <button (click)="openEdit(word)" title="編輯"
+                  class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                  <i class="fas fa-pen-to-square text-sm"></i>
+                </button>
+                <button (click)="confirmDelete(word)" title="刪除"
+                  class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </main>
+
+</div>

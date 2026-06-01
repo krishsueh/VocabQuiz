@@ -1,0 +1,58 @@
+<!-- 桌面版（/settings 路由）：加 padding + 置中；手機 overlay：不加樣式直接渲染卡片 -->
+<div class="lg:py-6 lg:px-6">
+  <div class="lg:max-w-sm lg:mx-auto">
+
+    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+
+      <div class="px-4 py-2.5 text-xs font-semibold text-blue-100 uppercase tracking-wider bg-blue-500 border-b border-blue-400">
+        卡片顯示
+      </div>
+
+      <!-- 主語言 -->
+      <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+        <div>
+          <p class="text-sm font-medium text-gray-800">主語言</p>
+          <p class="text-xs text-gray-400 mt-0.5">卡片大字顯示的語言</p>
+        </div>
+        <div class="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
+          <button
+            (click)="setPrimaryLang('korean')"
+            [class.bg-white]="settings.primaryLang === 'korean'"
+            [class.text-blue-600]="settings.primaryLang === 'korean'"
+            [class.font-medium]="settings.primaryLang === 'korean'"
+            [class.shadow-sm]="settings.primaryLang === 'korean'"
+            class="px-3 py-1.5 text-sm text-gray-500 rounded-md transition-all"
+          >韓文</button>
+          <button
+            (click)="setPrimaryLang('chinese')"
+            [class.bg-white]="settings.primaryLang === 'chinese'"
+            [class.text-blue-600]="settings.primaryLang === 'chinese'"
+            [class.font-medium]="settings.primaryLang === 'chinese'"
+            [class.shadow-sm]="settings.primaryLang === 'chinese'"
+            class="px-3 py-1.5 text-sm text-gray-500 rounded-md transition-all"
+          >中文</button>
+        </div>
+      </div>
+
+      <!-- 顯示翻譯 -->
+      <div class="flex items-center justify-between px-4 py-4">
+        <div>
+          <p class="text-sm font-medium text-gray-800">顯示翻譯</p>
+          <p class="text-xs text-gray-400 mt-0.5">在卡片上顯示次語言</p>
+        </div>
+        <button
+          (click)="toggleShowSecondary()"
+          class="relative w-11 h-6 rounded-full transition-colors overflow-hidden"
+          [class.bg-blue-500]="settings.showSecondary"
+          [class.bg-gray-300]="!settings.showSecondary"
+        >
+          <span
+            class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+            [ngClass]="settings.showSecondary ? 'left-[24px]' : 'left-1'"
+          ></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
