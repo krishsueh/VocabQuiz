@@ -8,6 +8,7 @@ import { Folder } from '../../models/folder.model';
 
 export interface WordDialogData {
   word?: Word;
+  defaultFolderId?: number | null;
 }
 
 @Component({
@@ -34,7 +35,7 @@ export class WordDialogComponent implements OnInit {
     this.form = this.fb.group({
       korean: [this.data?.word?.korean ?? '', Validators.required],
       chinese: [this.data?.word?.chinese ?? '', Validators.required],
-      folderId: [this.data?.word?.folderId ?? null],
+      folderId: [this.data?.word?.folderId ?? this.data?.defaultFolderId ?? null],
       category: [this.data?.word?.category ?? null],
     });
     this.db.getAllFolders().then(f => (this.folders = f));

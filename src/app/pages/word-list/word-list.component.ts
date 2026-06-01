@@ -128,8 +128,9 @@ export class WordListComponent implements OnInit, OnDestroy {
 
   // Word operations
   openAdd(): void {
+    const defaultFolderId = typeof this.activeView === 'number' ? this.activeView : null;
     const ref = this.dialog.open(WordDialogComponent, {
-      data: {},
+      data: { defaultFolderId },
       panelClass: 'dialog-panel',
       hasBackdrop: true,
     });
