@@ -52,6 +52,15 @@ export class WordDialogComponent implements OnInit {
       return;
     }
     const { korean, chinese, folderId, category } = this.form.value;
+
+    // 防呆：韓文單字重複檢查（編輯時排除自身）
+    const excludeId = this.isEdit ? this.data.word?.id : undefined;
+    const exists = await this.db.koreanExists(korean, excludeId);
+    if (exists) {
+      this.form.get('korean')!.setErrors({ duplicate: true });
+      return;
+    }
+
     const folderIdValue = folderId ? Number(folderId) : null;
     if (this.isEdit && this.data.word?.id != null) {
       await this.db.updateWord(this.data.word.id, { korean, chinese, folderId: folderIdValue, category });

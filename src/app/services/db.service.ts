@@ -45,6 +45,13 @@ export class DbService {
     if (error) throw error;
   }
 
+  async koreanExists(korean: string, excludeId?: number): Promise<boolean> {
+    let query = this.db.from('words').select('id').eq('korean', korean.trim());
+    if (excludeId != null) query = query.neq('id', excludeId);
+    const { data } = await query.limit(1);
+    return (data?.length ?? 0) > 0;
+  }
+
   async getAllWords(): Promise<Word[]> {
     const { data, error } = await this.db
       .from('words').select('*').order('korean');
