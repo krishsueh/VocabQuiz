@@ -8,7 +8,7 @@
         type="number"
         formControlName="count"
         min="1"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       @if (form.get('count')?.invalid && form.get('count')?.touched) {
         <p class="mt-1 text-xs text-red-600">題數至少為 1</p>

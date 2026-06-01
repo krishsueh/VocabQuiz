@@ -38,7 +38,7 @@
               [(ngModel)]="editingFolderName"
               (keydown)="onEditFolderKeydown($event)"
               (blur)="saveFolder()"
-              class="flex-1 px-2 py-1 text-sm border border-blue-400 rounded-md focus:outline-none"
+              class="flex-1 px-2 py-1 text-base border border-blue-400 rounded-md focus:outline-none"
               autofocus
             />
           } @else {
@@ -72,7 +72,7 @@
           [(ngModel)]="newFolderName"
           (keydown)="onNewFolderKeydown($event)"
           placeholder="新增資料夾…"
-          class="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+          class="flex-1 px-2 py-1.5 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
         />
         <button
           (click)="addFolder()"
