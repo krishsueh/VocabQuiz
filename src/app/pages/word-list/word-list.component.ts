@@ -134,7 +134,8 @@ export class WordListComponent implements OnInit, OnDestroy {
       panelClass: 'dialog-panel',
       hasBackdrop: true,
     });
-    ref.closed.subscribe(() => this.load());
+    // 新增單字不影響資料夾，只重載單字列表
+    ref.closed.subscribe(() => this.loadWords());
   }
 
   openEdit(word: Word): void {
@@ -143,17 +144,24 @@ export class WordListComponent implements OnInit, OnDestroy {
       panelClass: 'dialog-panel',
       hasBackdrop: true,
     });
-    ref.closed.subscribe(() => this.load());
+    // 編輯單字不影響資料夾，只重載單字列表
+    ref.closed.subscribe(() => this.loadWords());
   }
 
   confirmDelete(word: Word): void {
     if (confirm(`確定要刪除「${word.korean}」嗎？`)) {
-      this.db.deleteWord(word.id!).then(() => this.load());
+      // Optimistic: 立刻從畫面移除，背景刪除
+      this.words = this.words.filter(w => w.id !== word.id);
+      this.db.deleteWord(word.id!).catch(() => this.loadWords());
     }
   }
 
   toggleFavorite(word: Word): void {
-    this.db.toggleFavorite(word.id!, !word.isFavorite).then(() => this.loadWords());
+    // Optimistic: 立刻更新畫面，背景寫入
+    word.isFavorite = !word.isFavorite;
+    this.db.toggleFavorite(word.id!, word.isFavorite).catch(() => {
+      word.isFavorite = !word.isFavorite; // 失敗時還原
+    });
   }
 
   // Mobile folder management
