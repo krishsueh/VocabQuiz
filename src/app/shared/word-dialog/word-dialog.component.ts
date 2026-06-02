@@ -20,6 +20,7 @@ export interface WordDialogData {
 export class WordDialogComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
+  isSubmitting = false;
   folders: Folder[] = [];
   readonly categories = WORD_CATEGORIES;
 
@@ -47,27 +48,30 @@ export class WordDialogComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    const { korean, chinese, folderId, category } = this.form.value;
+    if (this.form.invalid || this.isSubmitting) return;
+    this.form.markAllAsTouched();
 
-    // 防呆：韓文單字重複檢查（編輯時排除自身）
-    const excludeId = this.isEdit ? this.data.word?.id : undefined;
-    const exists = await this.db.koreanExists(korean, excludeId);
-    if (exists) {
-      this.form.get('korean')!.setErrors({ duplicate: true });
-      return;
-    }
+    this.isSubmitting = true;
+    try {
+      const { korean, chinese, folderId, category } = this.form.value;
 
-    const folderIdValue = folderId ? Number(folderId) : null;
-    if (this.isEdit && this.data.word?.id != null) {
-      await this.db.updateWord(this.data.word.id, { korean, chinese, folderId: folderIdValue, category });
-    } else {
-      await this.db.addWord({ korean, chinese, folderId: folderIdValue, category, isFavorite: false, createdAt: new Date() });
+      const excludeId = this.isEdit ? this.data.word?.id : undefined;
+      const exists = await this.db.koreanExists(korean, excludeId);
+      if (exists) {
+        this.form.get('korean')!.setErrors({ duplicate: true });
+        return;
+      }
+
+      const folderIdValue = folderId ? Number(folderId) : null;
+      if (this.isEdit && this.data.word?.id != null) {
+        await this.db.updateWord(this.data.word.id, { korean, chinese, folderId: folderIdValue, category });
+      } else {
+        await this.db.addWord({ korean, chinese, folderId: folderIdValue, category, isFavorite: false, createdAt: new Date() });
+      }
+      this.dialogRef.close();
+    } finally {
+      this.isSubmitting = false;
     }
-    this.dialogRef.close();
   }
 
   cancel(): void {

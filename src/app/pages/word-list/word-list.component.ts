@@ -25,6 +25,7 @@ export class WordListComponent implements OnInit, OnDestroy {
   activeView: ViewType = 'all';
 
   viewMode: 'home' | 'list' = 'list';
+  isLoading = true;
   showNewFolderInput = false;
   folderEditMode = false;
   private _editModeJustEntered = false;
@@ -67,8 +68,12 @@ export class WordListComponent implements OnInit, OnDestroy {
   }
 
   async load(): Promise<void> {
+    this.isLoading = true;
     this.folders = await this.db.getAllFolders();
-    await this.loadWords();
+    if (this.viewMode !== 'home') {
+      await this.loadWords();
+    }
+    this.isLoading = false;
   }
 
   async loadWords(): Promise<void> {

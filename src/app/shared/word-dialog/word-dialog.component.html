@@ -74,8 +74,15 @@
       >取消</button>
       <button
         type="submit"
-        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-      >{{ isEdit ? '儲存' : '新增' }}</button>
+        [disabled]="isSubmitting"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+      >
+        @if (isSubmitting) {
+          <i class="fas fa-spinner fa-spin mr-1"></i>{{ isEdit ? '儲存中…' : '新增中…' }}
+        } @else {
+          {{ isEdit ? '儲存' : '新增' }}
+        }
+      </button>
     </div>
   </form>
 </div>

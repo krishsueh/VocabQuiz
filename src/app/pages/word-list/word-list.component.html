@@ -127,8 +127,17 @@
         </button>
       </div>
 
+      <!-- Loading state -->
+      @if (isLoading) {
+        <div class="flex flex-col gap-3">
+          @for (_ of [1,2,3,4,5]; track _) {
+            <div class="h-[72px] bg-gray-200 rounded-lg animate-pulse"></div>
+          }
+        </div>
+      }
+
       <!-- Empty state -->
-      @if (words.length === 0) {
+      @else if (words.length === 0) {
         <div class="text-center py-16 text-gray-400">
           <p class="text-4xl mb-3"><i class="fas fa-book-open"></i></p>
           @if (activeView === 'all') {
@@ -142,7 +151,7 @@
             <p class="text-sm mt-1">新增單字時選擇此資料夾即可</p>
           }
         </div>
-      } @else {
+      } @else if (!isLoading) {
         <div class="space-y-2">
           @for (word of words; track word.id) {
             <div class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
