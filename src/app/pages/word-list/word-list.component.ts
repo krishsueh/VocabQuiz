@@ -28,10 +28,15 @@ export class WordListComponent implements OnInit, OnDestroy {
   isLoading = true;
   showNewFolderInput = false;
   folderEditMode = false;
+  wordEditMode = false;
   private _editModeJustEntered = false;
+  private _wordEditModeJustEntered = false;
   private _longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private _wordLongPressTimer: ReturnType<typeof setTimeout> | null = null;
 
   newFolderName = '';
+  editingFolderId: number | null = null;
+  editingFolderName = '';
 
   get displaySettings(): DisplaySettings {
     return this.navService.displaySettings();
@@ -65,6 +70,7 @@ export class WordListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subs.unsubscribe();
     this.cancelLongPress();
+    this.cancelWordLongPress();
   }
 
   async load(): Promise<void> {
@@ -101,7 +107,7 @@ export class WordListComponent implements OnInit, OnDestroy {
   // Long press for jiggle edit mode
   startLongPress(): void {
     if (this.folderEditMode) return;
-    this._longPressTimer = setTimeout(() => { this.enterFolderEditMode(); }, 3000);
+    this._longPressTimer = setTimeout(() => { this.enterFolderEditMode(); }, 800);
   }
 
   cancelLongPress(): void {
@@ -123,6 +129,28 @@ export class WordListComponent implements OnInit, OnDestroy {
     if (this.folderEditMode && !this._editModeJustEntered) {
       this.folderEditMode = false;
     }
+    if (this.wordEditMode && !this._wordEditModeJustEntered) {
+      this.wordEditMode = false;
+    }
+  }
+
+  startWordLongPress(): void {
+    if (this.wordEditMode) return;
+    this._wordLongPressTimer = setTimeout(() => { this.enterWordEditMode(); }, 800);
+  }
+
+  cancelWordLongPress(): void {
+    if (this._wordLongPressTimer) {
+      clearTimeout(this._wordLongPressTimer);
+      this._wordLongPressTimer = null;
+    }
+  }
+
+  enterWordEditMode(): void {
+    this.cancelWordLongPress();
+    this.wordEditMode = true;
+    this._wordEditModeJustEntered = true;
+    setTimeout(() => { this._wordEditModeJustEntered = false; }, 300);
   }
 
   async onFolderDrop(event: CdkDragDrop<Folder[]>): Promise<void> {
@@ -170,6 +198,29 @@ export class WordListComponent implements OnInit, OnDestroy {
   }
 
   // Mobile folder management
+  startEditFolder(folder: Folder): void {
+    this.editingFolderId = folder.id!;
+    this.editingFolderName = folder.name;
+  }
+
+  async saveFolder(): Promise<void> {
+    const name = this.editingFolderName.trim();
+    if (!name || this.editingFolderId == null) { this.editingFolderId = null; return; }
+    await this.db.updateFolder(this.editingFolderId, name);
+    this.editingFolderId = null;
+    this.folders = await this.db.getAllFolders();
+    this.navService.foldersChanged$.next();
+  }
+
+  cancelEditFolder(): void {
+    this.editingFolderId = null;
+  }
+
+  onEditFolderKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') this.saveFolder();
+    if (event.key === 'Escape') this.cancelEditFolder();
+  }
+
   async addFolder(): Promise<void> {
     const name = this.newFolderName.trim();
     if (!name) return;

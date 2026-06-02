@@ -36,28 +36,46 @@
                  (touchstart)="startLongPress()"
                  (touchend)="cancelLongPress()"
                  (touchmove)="cancelLongPress()">
-              <div class="relative" [class.folder-jiggle]="folderEditMode">
-                @if (folderEditMode) {
-                  <button
-                    (click)="confirmDeleteFolder(folder); $event.stopPropagation()"
-                    class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
-                  >
-                    <i class="fas fa-xmark text-white" style="font-size:9px"></i>
-                  </button>
-                }
-                <button
-                  (click)="!folderEditMode && selectSource(folder.id!)"
-                  class="w-full flex items-center gap-4 px-4 py-4 bg-white rounded-xl border border-gray-200 text-left"
-                >
-                  <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                    <i class="fas fa-folder text-indigo-400"></i>
-                  </div>
-                  <span class="font-medium text-gray-800 truncate flex-1">{{ folder.name }}</span>
-                  @if (!folderEditMode) {
-                    <i class="fas fa-chevron-right text-gray-300 text-sm shrink-0"></i>
+              <!-- 改名 inline input -->
+              @if (editingFolderId === folder.id) {
+                <div class="flex items-center gap-2 bg-white rounded-xl border border-blue-300 px-4 py-3">
+                  <input
+                    type="text"
+                    [(ngModel)]="editingFolderName"
+                    (keydown)="onEditFolderKeydown($event)"
+                    class="flex-1 text-base focus:outline-none"
+                    autofocus
+                  />
+                  <button (click)="saveFolder()" class="text-blue-600 px-2 py-1 text-sm font-medium">完成</button>
+                  <button (click)="cancelEditFolder()" class="text-gray-400 px-1 py-1 text-sm">取消</button>
+                </div>
+              } @else {
+                <div class="relative select-none"
+                     [class.folder-jiggle]="folderEditMode">
+                  @if (folderEditMode) {
+                    <button
+                      (click)="confirmDeleteFolder(folder); $event.stopPropagation()"
+                      class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
+                    >
+                      <i class="fas fa-xmark text-white" style="font-size:9px"></i>
+                    </button>
                   }
-                </button>
-              </div>
+                  <button
+                    (click)="folderEditMode ? startEditFolder(folder) : selectSource(folder.id!)"
+                    class="w-full flex items-center gap-4 px-4 py-4 bg-white rounded-xl border border-gray-200 text-left"
+                  >
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                      <i class="fas fa-folder text-indigo-400"></i>
+                    </div>
+                    <span class="font-medium text-gray-800 truncate flex-1">{{ folder.name }}</span>
+                    @if (folderEditMode) {
+                      <i class="fas fa-pencil text-gray-300 text-xs shrink-0"></i>
+                    } @else {
+                      <i class="fas fa-chevron-right text-gray-300 text-sm shrink-0"></i>
+                    }
+                  </button>
+                </div>
+              }
               <ng-template cdkDragPlaceholder>
                 <div class="h-[72px] bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl"></div>
               </ng-template>
@@ -154,47 +172,74 @@
       } @else if (!isLoading) {
         <div class="space-y-2">
           @for (word of words; track word.id) {
-            <div class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-lg font-bold text-gray-900">
-                    {{ displaySettings.primaryLang === 'korean' ? word.korean : word.chinese }}
-                  </span>
-                  @if (displaySettings.showSecondary) {
-                    <span class="text-gray-500 text-sm">
-                      {{ displaySettings.primaryLang === 'korean' ? word.chinese : word.korean }}
+            <div class="relative select-none"
+                 [class.folder-jiggle]="wordEditMode"
+                 (touchstart)="startWordLongPress()"
+                 (touchend)="cancelWordLongPress()"
+                 (touchmove)="cancelWordLongPress()">
+              <!-- iOS 風格 ✕ 刪除（抖動模式） -->
+              @if (wordEditMode) {
+                <button
+                  (click)="confirmDelete(word); $event.stopPropagation()"
+                  class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
+                >
+                  <i class="fas fa-xmark text-white" style="font-size:9px"></i>
+                </button>
+              }
+              <!-- 卡片本體 -->
+              <div
+                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg transition-colors"
+                [class.cursor-pointer]="wordEditMode"
+                (click)="wordEditMode && openEdit(word)"
+              >
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-lg font-bold text-gray-900">
+                      {{ displaySettings.primaryLang === 'korean' ? word.korean : word.chinese }}
                     </span>
-                  }
-                </div>
-                @if (word.category || word.folderId != null) {
-                  <div class="flex items-center gap-2 mt-1">
-                    @if (word.category) {
-                      <span class="px-1.5 py-0.5 text-xs rounded-full font-medium {{ categoryColor[word.category] }}">
-                        {{ word.category }}
+                    @if (displaySettings.showSecondary) {
+                      <span class="text-gray-500 text-sm">
+                        {{ displaySettings.primaryLang === 'korean' ? word.chinese : word.korean }}
                       </span>
                     }
-                    @if (word.folderId != null) {
-                      <span class="text-xs text-gray-400"><i class="fas fa-folder"></i> {{ folderName(word.folderId) }}</span>
-                    }
                   </div>
-                }
-              </div>
-              <div class="flex items-center gap-1 shrink-0">
-                <button
-                  (click)="toggleFavorite(word)"
-                  class="text-xl hover:scale-110 transition-transform p-1"
-                  [title]="word.isFavorite ? '取消收藏' : '加入收藏'"
-                >
-                  <i [class]="word.isFavorite ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'"></i>
-                </button>
-                <button (click)="openEdit(word)" title="編輯"
-                  class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                  <i class="fas fa-pen-to-square text-sm"></i>
-                </button>
-                <button (click)="confirmDelete(word)" title="刪除"
-                  class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                  <i class="fas fa-trash text-sm"></i>
-                </button>
+                  @if (word.category || word.folderId != null) {
+                    <div class="flex items-center gap-2 mt-1">
+                      @if (word.category) {
+                        <span class="px-1.5 py-0.5 text-xs rounded-full font-medium {{ categoryColor[word.category] }}">
+                          {{ word.category }}
+                        </span>
+                      }
+                      @if (word.folderId != null) {
+                        <span class="text-xs text-gray-400"><i class="fas fa-folder"></i> {{ folderName(word.folderId) }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <!-- 桌面：一直顯示操作按鈕；手機抖動模式：顯示鉛筆提示 -->
+                <div class="flex items-center gap-1 shrink-0">
+                  @if (wordEditMode) {
+                    <!-- 抖動模式：鉛筆提示可點擊 -->
+                    <i class="fas fa-pencil text-gray-300 text-xs"></i>
+                  } @else {
+                    <!-- 正常模式：★ + 桌面版才顯示 ✎🗑 -->
+                    <button
+                      (click)="toggleFavorite(word); $event.stopPropagation()"
+                      class="text-xl hover:scale-110 transition-transform p-1"
+                      [title]="word.isFavorite ? '取消收藏' : '加入收藏'"
+                    >
+                      <i [class]="word.isFavorite ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'"></i>
+                    </button>
+                    <button (click)="openEdit(word)" title="編輯"
+                      class="hidden lg:flex p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      <i class="fas fa-pen-to-square text-sm"></i>
+                    </button>
+                    <button (click)="confirmDelete(word)" title="刪除"
+                      class="hidden lg:flex p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                      <i class="fas fa-trash text-sm"></i>
+                    </button>
+                  }
+                </div>
               </div>
             </div>
           }
