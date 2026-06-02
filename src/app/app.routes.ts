@@ -18,6 +18,11 @@ export const routes: Routes = [
           import('./pages/quiz/quiz.component').then(m => m.QuizComponent),
       },
       {
+        path: 'quiz/play',
+        loadComponent: () =>
+          import('./pages/quiz-play/quiz-play.component').then(m => m.QuizPlayComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('./pages/settings/settings.component').then(m => m.SettingsComponent),
