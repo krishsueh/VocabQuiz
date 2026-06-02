@@ -50,30 +50,28 @@
                   <button (click)="cancelEditFolder()" class="text-gray-400 px-1 py-1 text-sm">取消</button>
                 </div>
               } @else {
-                <div class="relative select-none"
-                     [class.folder-jiggle]="folderEditMode">
-                  @if (folderEditMode) {
-                    <button
-                      (click)="confirmDeleteFolder(folder); $event.stopPropagation()"
-                      class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
-                    >
-                      <i class="fas fa-xmark text-white" style="font-size:9px"></i>
-                    </button>
-                  }
-                  <button
-                    (click)="folderEditMode ? startEditFolder(folder) : selectSource(folder.id!)"
-                    class="w-full flex items-center gap-4 px-4 py-4 bg-white rounded-xl border border-gray-200 text-left"
-                  >
+                <div class="relative select-none" [class.folder-jiggle]="folderEditMode">
+                  <div class="flex items-center gap-4 px-4 py-4 bg-white rounded-xl border border-gray-200">
                     <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
                       <i class="fas fa-folder text-indigo-400"></i>
                     </div>
-                    <span class="font-medium text-gray-800 truncate flex-1">{{ folder.name }}</span>
+                    <button
+                      (click)="!folderEditMode && selectSource(folder.id!)"
+                      class="flex-1 font-medium text-gray-800 truncate text-left"
+                    >{{ folder.name }}</button>
                     @if (folderEditMode) {
-                      <i class="fas fa-pencil text-gray-300 text-xs shrink-0"></i>
+                      <button (click)="startEditFolder(folder)"
+                        class="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors shrink-0">
+                        <i class="fas fa-pencil text-sm"></i>
+                      </button>
+                      <button (click)="confirmDeleteFolder(folder); $event.stopPropagation()"
+                        class="p-1.5 text-gray-400 hover:text-red-500 rounded transition-colors shrink-0">
+                        <i class="fas fa-trash text-sm"></i>
+                      </button>
                     } @else {
                       <i class="fas fa-chevron-right text-gray-300 text-sm shrink-0"></i>
                     }
-                  </button>
+                  </div>
                 </div>
               }
               <ng-template cdkDragPlaceholder>
@@ -205,21 +203,8 @@
                  (touchstart)="startWordLongPress()"
                  (touchend)="cancelWordLongPress()"
                  (touchmove)="cancelWordLongPress()">
-              <!-- iOS 風格 ✕ 刪除（抖動模式） -->
-              @if (wordEditMode) {
-                <button
-                  (click)="confirmDelete(word); $event.stopPropagation()"
-                  class="absolute -top-2 -left-2 z-10 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center shadow-md"
-                >
-                  <i class="fas fa-xmark text-white" style="font-size:9px"></i>
-                </button>
-              }
               <!-- 卡片本體 -->
-              <div
-                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg transition-colors"
-                [class.cursor-pointer]="wordEditMode"
-                (click)="wordEditMode && openEdit(word)"
-              >
+              <div class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg transition-colors">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-lg font-bold text-gray-900">
@@ -244,11 +229,18 @@
                     </div>
                   }
                 </div>
-                <!-- 桌面：一直顯示操作按鈕；手機抖動模式：顯示鉛筆提示 -->
+                <!-- 右側按鈕：抖動模式 ✎🗑，正常模式 ★（+ 桌面版 ✎🗑） -->
                 <div class="flex items-center gap-1 shrink-0">
                   @if (wordEditMode) {
-                    <!-- 抖動模式：鉛筆提示可點擊 -->
-                    <i class="fas fa-pencil text-gray-300 text-xs"></i>
+                    <!-- 抖動模式：編輯 + 刪除 -->
+                    <button (click)="openEdit(word); $event.stopPropagation()" title="編輯"
+                      class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      <i class="fas fa-pen-to-square text-sm"></i>
+                    </button>
+                    <button (click)="confirmDelete(word); $event.stopPropagation()" title="刪除"
+                      class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                      <i class="fas fa-trash text-sm"></i>
+                    </button>
                   } @else {
                     <!-- 正常模式：★ + 桌面版才顯示 ✎🗑 -->
                     <button
