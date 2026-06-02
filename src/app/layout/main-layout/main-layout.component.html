@@ -24,7 +24,7 @@
       </button>
     </div>
 
-    <!-- 可捲動的資料夾列表（flex-1 讓它佔滿剩餘空間，min-h-0 防止 flex 溢出） -->
+    <!-- 可捲動的資料夾列表（僅資料夾，input 移至外部避免溢出） -->
     <div class="flex-1 min-h-0 overflow-y-auto px-3 py-1 flex flex-col gap-1">
       @if (folders.length > 0) {
         <hr class="my-1 border-gray-200" />
@@ -38,7 +38,7 @@
               [(ngModel)]="editingFolderName"
               (keydown)="onEditFolderKeydown($event)"
               (blur)="saveFolder()"
-              class="flex-1 px-2 py-1 text-base border border-blue-400 rounded-md focus:outline-none"
+              class="flex-1 min-w-0 px-2 py-1 text-base border border-blue-400 rounded-md focus:outline-none"
               autofocus
             />
           } @else {
@@ -63,21 +63,22 @@
           }
         </div>
       }
+    </div>
 
-      <hr class="my-1 border-gray-200" />
-
-      <div class="flex items-center gap-1 px-1">
+    <!-- 新增資料夾（固定在捲動區塊下方，不隨資料夾列表捲動） -->
+    <div class="px-3 py-2 border-t border-gray-200">
+      <div class="flex items-center gap-1">
         <input
           type="text"
           [(ngModel)]="newFolderName"
           (keydown)="onNewFolderKeydown($event)"
           placeholder="新增資料夾…"
-          class="flex-1 px-2 py-1.5 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+          class="flex-1 min-w-0 px-2 py-1.5 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
         />
         <button
           (click)="addFolder()"
           [disabled]="!newFolderName.trim()"
-          class="px-2 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md disabled:opacity-40 transition-colors"
+          class="shrink-0 px-2 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md disabled:opacity-40 transition-colors"
         ><i class="fas fa-plus"></i></button>
       </div>
     </div>
