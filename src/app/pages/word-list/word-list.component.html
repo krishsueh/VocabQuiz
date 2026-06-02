@@ -120,25 +120,53 @@
         [class.pb-20]="viewMode === 'list'">
     <div>
 
-      <!-- Mobile/Tablet: back button + title -->
-      <div class="flex items-center gap-3 mb-5 lg:hidden">
-        <button (click)="goHome()" class="w-8 h-8 flex items-center justify-center text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+      <!-- Mobile/Tablet: back button + title + toggle -->
+      <div class="flex items-center gap-2 mb-5 lg:hidden">
+        <button (click)="goHome()" class="w-8 h-8 flex items-center justify-center text-blue-600 rounded-lg hover:bg-blue-50 transition-colors shrink-0">
           <i class="fas fa-arrow-left"></i>
         </button>
-        <h1 class="text-xl font-bold text-gray-800 flex-1">
+        <h1 class="text-xl font-bold text-gray-800 flex-1 truncate">
           @if (activeView === 'all') { 所有卡片 }
           @else if (activeView === 'favorites') { <i class="fas fa-star text-yellow-400"></i> 標記收藏 }
           @else { <i class="fas fa-folder text-gray-500"></i> {{ folderName(activeView) }} }
         </h1>
+        @if (activeView !== 'all' && activeView !== 'favorites') {
+          <div class="flex bg-gray-100 rounded-lg p-0.5 gap-0.5 shrink-0">
+            <button (click)="showFavoritesOnly = false"
+              class="px-2 py-1 text-xs rounded-md transition-all"
+              [class.bg-white]="!showFavoritesOnly" [class.text-blue-600]="!showFavoritesOnly"
+              [class.font-medium]="!showFavoritesOnly" [class.shadow-sm]="!showFavoritesOnly"
+              [class.text-gray-500]="showFavoritesOnly">全部</button>
+            <button (click)="showFavoritesOnly = true"
+              class="px-2 py-1 text-xs rounded-md transition-all"
+              [class.bg-white]="showFavoritesOnly" [class.text-blue-600]="showFavoritesOnly"
+              [class.font-medium]="showFavoritesOnly" [class.shadow-sm]="showFavoritesOnly"
+              [class.text-gray-500]="!showFavoritesOnly"><i class="fas fa-star text-xs text-yellow-400"></i> 收藏</button>
+          </div>
+        }
       </div>
 
-      <!-- Desktop: title + add button -->
+      <!-- Desktop: title + toggle + add button -->
       <div class="hidden lg:flex items-center gap-2 mb-5">
         <h1 class="text-xl font-bold text-gray-800 flex-1">
           @if (activeView === 'all') { 所有卡片 }
           @else if (activeView === 'favorites') { <i class="fas fa-star text-yellow-400"></i> 標記收藏 }
           @else { <i class="fas fa-folder text-gray-500"></i> {{ folderName(activeView) }} }
         </h1>
+        @if (activeView !== 'all' && activeView !== 'favorites') {
+          <div class="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
+            <button (click)="showFavoritesOnly = false"
+              class="px-3 py-1.5 text-sm rounded-md transition-all"
+              [class.bg-white]="!showFavoritesOnly" [class.text-blue-600]="!showFavoritesOnly"
+              [class.font-medium]="!showFavoritesOnly" [class.shadow-sm]="!showFavoritesOnly"
+              [class.text-gray-500]="showFavoritesOnly">全部</button>
+            <button (click)="showFavoritesOnly = true"
+              class="px-3 py-1.5 text-sm rounded-md transition-all"
+              [class.bg-white]="showFavoritesOnly" [class.text-blue-600]="showFavoritesOnly"
+              [class.font-medium]="showFavoritesOnly" [class.shadow-sm]="showFavoritesOnly"
+              [class.text-gray-500]="!showFavoritesOnly"><i class="fas fa-star text-xs text-yellow-400 mr-1"></i>收藏</button>
+          </div>
+        }
         <button (click)="openAdd()"
           class="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
           <i class="fas fa-plus"></i> 新增單字

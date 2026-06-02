@@ -27,6 +27,7 @@ export class WordListComponent implements OnInit, OnDestroy {
   viewMode: 'home' | 'list' = 'list';
   isLoading = true;
   showNewFolderInput = false;
+  showFavoritesOnly = false;
   folderEditMode = false;
   wordEditMode = false;
   private _editModeJustEntered = false;
@@ -43,11 +44,17 @@ export class WordListComponent implements OnInit, OnDestroy {
   }
 
   get displayWords(): Word[] {
+    let result = this.words;
+    if (this.showFavoritesOnly) {
+      result = result.filter(w => w.isFavorite);
+    }
     const q = this.navService.searchQuery().trim().toLowerCase();
-    if (!q) return this.words;
-    return this.words.filter(w =>
-      w.korean.toLowerCase().includes(q) || w.chinese.toLowerCase().includes(q)
-    );
+    if (q) {
+      result = result.filter(w =>
+        w.korean.toLowerCase().includes(q) || w.chinese.toLowerCase().includes(q)
+      );
+    }
+    return result;
   }
 
   private subs = new Subscription();
@@ -102,6 +109,7 @@ export class WordListComponent implements OnInit, OnDestroy {
 
   selectSource(view: ViewType): void {
     this.folderEditMode = false;
+    this.showFavoritesOnly = false;
     this.activeView = view;
     this.navService.activeWordView.set(view as 'all' | 'favorites' | number);
     this.viewMode = 'list';
