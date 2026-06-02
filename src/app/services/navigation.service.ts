@@ -29,6 +29,7 @@ export class NavigationService {
   goHome$ = new Subject<void>();
   openAdd$ = new Subject<void>();
   openSettings$ = new Subject<void>();
+  readonly searchQuery = signal<string>('');
   setWordView$ = new Subject<'all' | 'favorites' | number>();
   foldersChanged$ = new Subject<void>();
 

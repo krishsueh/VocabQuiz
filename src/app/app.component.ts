@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NavigationService } from './services/navigation.service';
 import { SettingsComponent } from './pages/settings/settings.component';
@@ -6,7 +7,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsComponent, FormsModule],
   templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
@@ -14,6 +15,12 @@ export class AppComponent implements OnInit {
   private navService = inject(NavigationService);
 
   settingsOpen = false;
+  searchOpen = false;
+  searchInput = '';
+
+  get isOnWords(): boolean {
+    return this.router.url.startsWith('/words');
+  }
 
   ngOnInit(): void {
     this.navService.openSettings$.subscribe(() => {
@@ -21,8 +28,21 @@ export class AppComponent implements OnInit {
     });
   }
 
-  get isOnWords(): boolean {
-    return this.router.url.startsWith('/words');
+  toggleSearch(): void {
+    this.searchOpen = !this.searchOpen;
+    if (!this.searchOpen) {
+      this.searchInput = '';
+      this.navService.searchQuery.set('');
+    }
+  }
+
+  onSearchInput(): void {
+    this.navService.searchQuery.set(this.searchInput);
+  }
+
+  clearSearch(): void {
+    this.searchInput = '';
+    this.navService.searchQuery.set('');
   }
 
   openSettings(): void {

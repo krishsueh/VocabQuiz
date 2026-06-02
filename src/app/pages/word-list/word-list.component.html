@@ -171,7 +171,7 @@
         </div>
       } @else if (!isLoading) {
         <div class="space-y-2">
-          @for (word of words; track word.id) {
+          @for (word of displayWords; track word.id) {
             <div class="relative select-none"
                  [class.folder-jiggle]="wordEditMode"
                  (touchstart)="startWordLongPress()"

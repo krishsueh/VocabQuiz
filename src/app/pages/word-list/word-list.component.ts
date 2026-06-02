@@ -42,6 +42,14 @@ export class WordListComponent implements OnInit, OnDestroy {
     return this.navService.displaySettings();
   }
 
+  get displayWords(): Word[] {
+    const q = this.navService.searchQuery().trim().toLowerCase();
+    if (!q) return this.words;
+    return this.words.filter(w =>
+      w.korean.toLowerCase().includes(q) || w.chinese.toLowerCase().includes(q)
+    );
+  }
+
   private subs = new Subscription();
 
   constructor(
