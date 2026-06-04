@@ -12,12 +12,8 @@
         class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="예: 안녕하세요"
       />
-      @if (form.get('korean')?.touched) {
-        @if (form.get('korean')?.errors?.['required']) {
-          <p class="mt-1 text-xs text-red-600">韓文為必填</p>
-        } @else if (form.get('korean')?.errors?.['duplicate']) {
-          <p class="mt-1 text-xs text-red-600">此韓文單字已存在</p>
-        }
+      @if (form.get('korean')?.invalid && form.get('korean')?.touched) {
+        <p class="mt-1 text-xs text-red-600">韓文為必填</p>
       }
     </div>
 

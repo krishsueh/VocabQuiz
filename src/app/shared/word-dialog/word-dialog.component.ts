@@ -56,13 +56,6 @@ export class WordDialogComponent implements OnInit {
     try {
       const { korean, chinese, folderId, category, notes } = this.form.value;
 
-      const excludeId = this.isEdit ? this.data.word?.id : undefined;
-      const exists = await this.db.koreanExists(korean, excludeId);
-      if (exists) {
-        this.form.get('korean')!.setErrors({ duplicate: true });
-        return;
-      }
-
       const folderIdValue = folderId ? Number(folderId) : null;
       const notesValue = notes?.trim() || null;
       if (this.isEdit && this.data.word?.id != null) {
