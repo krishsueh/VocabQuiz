@@ -13,8 +13,8 @@ import { Word, CATEGORY_COLOR } from '../../models/word.model';
 export class QuizPlayComponent implements OnInit {
   words: Word[] = [];
   direction: 'ko-to-zh' | 'zh-to-ko' = 'ko-to-zh';
-  showAnswers = false;
   readonly categoryColor = CATEGORY_COLOR;
+  private revealedIds = new Set<number>();
 
   constructor(private quizState: QuizStateService, private router: Router) {}
 
@@ -35,8 +35,16 @@ export class QuizPlayComponent implements OnInit {
     return this.direction === 'ko-to-zh' ? 'chinese' : 'korean';
   }
 
-  toggleAnswers(): void {
-    this.showAnswers = !this.showAnswers;
+  isRevealed(wordId: number): boolean {
+    return this.revealedIds.has(wordId);
+  }
+
+  toggleReveal(wordId: number): void {
+    if (this.revealedIds.has(wordId)) {
+      this.revealedIds.delete(wordId);
+    } else {
+      this.revealedIds.add(wordId);
+    }
   }
 
   exit(): void {

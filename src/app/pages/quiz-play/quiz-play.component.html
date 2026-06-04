@@ -1,54 +1,61 @@
-<div class="flex flex-col min-h-full pb-40 lg:pb-20">
+<div class="flex flex-col pb-20 lg:pb-6">
+
+  <!-- 標題列 -->
+  <div class="px-4 py-4 border-b border-gray-100">
+    <p class="text-sm text-gray-500">
+      共 {{ words.length }} 題・{{ direction === 'ko-to-zh' ? '韓文 → 中文' : '中文 → 韓文' }}
+    </p>
+  </div>
 
   <!-- 題目卡片列表 -->
   <div class="px-4 py-4 space-y-2">
-    <p class="text-xs text-gray-400 mb-3">共 {{ words.length }} 題・{{ direction === 'ko-to-zh' ? '韓文 → 中文' : '中文 → 韓文' }}</p>
-
     @for (word of words; track word.id; let i = $index) {
       <div class="bg-white border border-gray-200 rounded-lg p-4">
         <div class="flex items-start gap-3">
-          <span class="text-xs text-gray-400 mt-1 shrink-0">{{ i + 1 }}</span>
+          <!-- 題號 -->
+          <span class="text-xs text-gray-400 mt-1.5 shrink-0 w-5 text-center">{{ i + 1 }}</span>
+
+          <!-- 題目 + 詞性 -->
           <div class="flex-1 min-w-0">
-            <!-- 題目（主語言） -->
             <div class="text-lg font-bold text-gray-900">{{ word[questionLang] }}</div>
-            <!-- 答案（次語言，點對答案後顯示） -->
-            @if (showAnswers) {
-              <div class="text-gray-500 text-sm mt-1 pt-1 border-t border-gray-100">
-                {{ word[answerLang] }}
-              </div>
-            } @else {
-              <div class="text-gray-200 text-sm mt-1 select-none">——</div>
-            }
-            <!-- 詞性 badge -->
             @if (word.category) {
               <span class="inline-block mt-1.5 px-1.5 py-0.5 text-xs rounded-full font-medium {{ categoryColor[word.category] }}">
                 {{ word.category }}
               </span>
             }
           </div>
+
+          <!-- 右側：pill 按鈕 + 答案 -->
+          <div class="flex flex-col items-end gap-1.5 shrink-0">
+            <button
+              (click)="toggleReveal(word.id!)"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+              [class.border-blue-200]="!isRevealed(word.id!)"
+              [class.bg-blue-50]="!isRevealed(word.id!)"
+              [class.text-blue-600]="!isRevealed(word.id!)"
+              [class.border-gray-200]="isRevealed(word.id!)"
+              [class.bg-white]="isRevealed(word.id!)"
+              [class.text-gray-400]="isRevealed(word.id!)"
+            >
+              {{ isRevealed(word.id!) ? '隱藏' : '對答案' }}
+            </button>
+            @if (isRevealed(word.id!)) {
+              <div class="text-gray-500 text-sm text-right">
+                {{ word[answerLang] }}
+              </div>
+            }
+          </div>
         </div>
       </div>
     }
   </div>
-</div>
 
-<!-- 固定底部按鈕 -->
-<div class="fixed bottom-16 lg:bottom-0 left-0 right-0 lg:left-52 bg-white border-t border-gray-200 flex gap-3 px-4 py-3 z-[35]">
-  <button
-    (click)="exit()"
-    class="flex-1 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-  >
-    結束
-  </button>
-  <button
-    (click)="toggleAnswers()"
-    class="flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors"
-    [class.bg-blue-600]="!showAnswers"
-    [class.text-white]="!showAnswers"
-    [class.hover:bg-blue-700]="!showAnswers"
-    [class.bg-green-100]="showAnswers"
-    [class.text-green-700]="showAnswers"
-  >
-    {{ showAnswers ? '隱藏答案' : '對答案' }}
-  </button>
+  <!-- 結束按鈕 -->
+  <div class="px-4 pb-6">
+    <button (click)="exit()"
+      class="w-full py-2.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+      結束
+    </button>
+  </div>
+
 </div>
