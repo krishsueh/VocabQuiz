@@ -32,6 +32,17 @@ app-root {
   padding: 1rem;
 }
 
+/* 單字詳情彈窗翻轉動畫 */
+@keyframes word-card-flip {
+  0%   { transform: perspective(800px) rotateY(-90deg) scale(0.9); opacity: 0; }
+  60%  { transform: perspective(800px) rotateY(8deg) scale(1.02); }
+  100% { transform: perspective(800px) rotateY(0deg) scale(1); opacity: 1; }
+}
+
+.word-card-flip {
+  animation: word-card-flip 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 /* 資料夾編輯模式抖動動畫（仿 iOS 主畫面） */
 @keyframes folder-jiggle {
   0%, 100% { transform: rotate(0deg); }

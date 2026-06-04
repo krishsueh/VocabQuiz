@@ -28,6 +28,7 @@ export class WordListComponent implements OnInit, OnDestroy {
   isLoading = true;
   showNewFolderInput = false;
   showFavoritesOnly = false;
+  selectedWord: Word | null = null;
   folderEditMode = false;
   wordEditMode = false;
   private _editModeJustEntered = false;
@@ -173,6 +174,14 @@ export class WordListComponent implements OnInit, OnDestroy {
     moveItemInArray(this.folders, event.previousIndex, event.currentIndex);
     await this.db.updateFolderOrders(this.folders);
     this.navService.foldersChanged$.next();
+  }
+
+  openWordDetail(word: Word): void {
+    this.selectedWord = word;
+  }
+
+  closeWordDetail(): void {
+    this.selectedWord = null;
   }
 
   // Word operations
