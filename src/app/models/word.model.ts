@@ -17,5 +17,6 @@ export interface Word {
   folderId: number | null;
   isFavorite: boolean;
   category: WordCategory | null;
+  notes: string | null;
   createdAt: Date;
 }

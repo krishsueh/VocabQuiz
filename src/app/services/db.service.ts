@@ -22,6 +22,7 @@ export class DbService {
         folder_id: word.folderId,
         is_favorite: word.isFavorite,
         category: word.category,
+        notes: word.notes ?? null,
       })
       .select('id')
       .single();
@@ -36,6 +37,7 @@ export class DbService {
     if (changes.folderId !== undefined) patch['folder_id'] = changes.folderId;
     if (changes.isFavorite !== undefined) patch['is_favorite'] = changes.isFavorite;
     if (changes.category !== undefined) patch['category'] = changes.category;
+    if (changes.notes !== undefined) patch['notes'] = changes.notes;
     const { error } = await this.db.from('words').update(patch).eq('id', id);
     if (error) throw error;
   }
@@ -136,6 +138,7 @@ export class DbService {
       folderId: row['folder_id'] as number | null,
       isFavorite: row['is_favorite'] as boolean,
       category: row['category'] as Word['category'],
+      notes: (row['notes'] as string) ?? null,
       createdAt: new Date(row['created_at'] as string),
     };
   }

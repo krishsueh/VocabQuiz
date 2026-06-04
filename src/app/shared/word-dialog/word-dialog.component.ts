@@ -38,6 +38,7 @@ export class WordDialogComponent implements OnInit {
       chinese: [this.data?.word?.chinese ?? '', Validators.required],
       folderId: [this.data?.word?.folderId ?? this.data?.defaultFolderId ?? null],
       category: [this.data?.word?.category ?? null],
+      notes: [this.data?.word?.notes ?? ''],
     });
     this.db.getAllFolders().then(f => (this.folders = f));
   }
@@ -53,7 +54,7 @@ export class WordDialogComponent implements OnInit {
 
     this.isSubmitting = true;
     try {
-      const { korean, chinese, folderId, category } = this.form.value;
+      const { korean, chinese, folderId, category, notes } = this.form.value;
 
       const excludeId = this.isEdit ? this.data.word?.id : undefined;
       const exists = await this.db.koreanExists(korean, excludeId);
@@ -63,10 +64,11 @@ export class WordDialogComponent implements OnInit {
       }
 
       const folderIdValue = folderId ? Number(folderId) : null;
+      const notesValue = notes?.trim() || null;
       if (this.isEdit && this.data.word?.id != null) {
-        await this.db.updateWord(this.data.word.id, { korean, chinese, folderId: folderIdValue, category });
+        await this.db.updateWord(this.data.word.id, { korean, chinese, folderId: folderIdValue, category, notes: notesValue });
       } else {
-        await this.db.addWord({ korean, chinese, folderId: folderIdValue, category, isFavorite: false, createdAt: new Date() });
+        await this.db.addWord({ korean, chinese, folderId: folderIdValue, category, notes: notesValue, isFavorite: false, createdAt: new Date() });
       }
       this.dialogRef.close();
     } finally {
